@@ -8,6 +8,7 @@ void PrintArr(vector<int> &inputArr)
 {
     for (int i = 0; i < inputArr.size(); ++i)
         cout << inputArr[i] << " ";
+    cout << endl;
 }
 
 int main()
@@ -41,7 +42,7 @@ int main()
 
     while (border != 1)
     {
-        //PrintArr(CurrentPermutation);
+        PrintArr(currentPermutation);
         border = numberOfElems;
 
         while (currentPermutation[reversePermutation[border] + direction[border]] > border && border > 1)
@@ -50,10 +51,10 @@ int main()
             border = border - 1;
         }
 
-        swap(currentPermutation[reversePermutation[border]], currentPermutation[reversePermutation[border] + direction[border]]);
-        swap(reversePermutation[currentPermutation[reversePermutation[border]]], reversePermutation[border]);
-
-        //cout << "\n";
+        swap(currentPermutation[reversePermutation[border]], 
+            currentPermutation[reversePermutation[border] + direction[border]]);
+        swap(reversePermutation[currentPermutation[reversePermutation[border]]], 
+            reversePermutation[border]);
     }
 
     double duration = t.elapsed();
