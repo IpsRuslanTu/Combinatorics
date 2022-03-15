@@ -45,7 +45,8 @@ int main()
         PrintArr(currentPermutation);
         border = numberOfElems;
 
-        while (currentPermutation[reversePermutation[border] + direction[border]] > border && border > 1)
+        while (currentPermutation[reversePermutation[border] + direction[border]] > 
+            border && border > 1)
         {
             direction[border] = -direction[border];
             border = border - 1;
