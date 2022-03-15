@@ -28,31 +28,27 @@ int main()
 	boost::timer t;
 	t.restart();
 
-    vector<int> b(k + 1);
+    vector<int> arr(k + 1);
 
     for (int i = 0; i <= k; ++i)
     {
-        b[i] = 0;
+        arr[i] = 0;
     }
 
-    int count = 0;
-
-    while (b[k] != 1)
+    while (arr[k] != 1)
     {
-        ++count;
-        PrintArr(b);
+        PrintArr(arr);
         int i = 0;
-        while (b[i] == N - 1)
+        while (arr[i] == N - 1)
         {
-            b[i] = 0;
+            arr[i] = 0;
             ++i;
         }
-        b[i] = b[i] + 1;
+        ++arr[i];
     }
 
     // --------------------------------------------------------------
 
     double duration = t.elapsed();
     cout << duration << endl;
-    cout << count;
 }
