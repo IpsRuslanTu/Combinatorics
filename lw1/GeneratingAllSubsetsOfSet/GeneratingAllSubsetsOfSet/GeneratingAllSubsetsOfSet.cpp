@@ -25,11 +25,9 @@ int main()
     for (int i = 0; i < N; ++i)
         b[i] = 0;
 
-    int count = 0;
     while (b[b.size() - 1] != 1)
     {
-        ++count;
-        //PrintArr(b);
+        PrintArr(b);
         int i = 0;
         while (b[i] == 1)
         {
@@ -41,5 +39,4 @@ int main()
 
     double duration = t.elapsed();
     cout << duration << endl;
-    cout << count << endl;
 }
