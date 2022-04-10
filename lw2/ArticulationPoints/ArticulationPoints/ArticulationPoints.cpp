@@ -7,6 +7,12 @@
 
 using namespace std;
 
+struct Edge
+{
+	int min;
+	int max;
+};
+
 void PrintStack(stack<int> s);
 void PrintGraph(vector<vector<int>> graph, int size);
 
@@ -39,9 +45,10 @@ int main(int argc, char* argv[])
 	vector<int> tin(countVertices + 1, 0);
 	vector<int> tout(countVertices + 1, 0);
 	vector<bool> visited(countVertices + 1, false);
-
+	Edge edge;
+	vector<Edge> reverseEdges;
+	int parent = 0;
 	int vertex = 1;
-
 	stack<int> stack;
 	stack.push(vertex);
 
@@ -49,9 +56,6 @@ int main(int argc, char* argv[])
 
 	while (!stack.empty())
 	{
-		PrintStack(stack);
-		cout << endl;
-
 		int vertex = stack.top();
 		visited[vertex] = true;
 
@@ -60,52 +64,101 @@ int main(int argc, char* argv[])
 			tin[vertex] = ++timer;
 		}
 
+		isPath = false;
 		for (int i = 1; i <= countVertices; ++i)
 		{
-			if (graph[vertex][i] == 1 && !visited[i])
+			if (graph[vertex][i] == 1)
 			{
-				stack.push(i);
-				isPath = true;
-				break;
-			}
-			else
-			{
-				isPath = false;
+				if (!visited[i])
+				{
+					parent = stack.top();
+					stack.push(i);
+					isPath = true;
+					break;
+				}
+				if (visited[i] && tin[vertex] - tin[i] > 1 && !tout[parent] && i != parent)
+				{
+					if (i < vertex)
+					{
+						edge.min = i;
+						edge.max = vertex;
+					}
+					else
+					{
+						edge.min = vertex;
+						edge.max = i;
+					}
+					reverseEdges.push_back(edge);
+				}
 			}
 		}
 
 		if (!isPath)
 		{
+			parent = stack.top();
 			stack.pop();
 			tout[vertex] = ++timer;
 		}
 	}
 
-	//Печать времени входа
-	copy(tin.begin() + 1, tin.end(), ostream_iterator<int>(cout, " "));
-	cout << endl;
+	set<int> point;
+	int root = 1;
 
-	//Печать времени выхода
-	copy(tout.begin() + 1, tout.end(), ostream_iterator<int>(cout, " "));
+	for (int i = 1; i <= countVertices; ++i)
+	{
+		bool isArt = true;
+		bool hasChild = false;
+		for (int j = 1; j <= countVertices; ++j)
+		{
+			if (tin[i] < tin[j] && tout[i] > tout[j])
+			{
+				hasChild = true;
+				for (auto x : reverseEdges)
+				{
+					if (x.max == j)
+					{
+						if (x.min < i)
+						{
+							isArt = false;
+						}
+					}
+				}
+			}
+		}
+		if (i == root)
+		{
+			bool test = false;
+			for (int k = 1; k <= countVertices; ++k)
+			{
+				if (graph[i][k] == 1)
+				{
+					if (tin[k] - 1 == tin[i] && tout[k] + 1 == tout[i])
+					{
+						test = true;
+					}
+				}
+			}
+			if (!test)
+			{
+				point.insert(i);
+			}
+			continue;
+		}
+		if (!hasChild)
+		{
+			continue;
+		}
+		if (isArt)
+		{
+			point.insert(i);
+		}
+	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-	//Печать обратных ребер
-	//for (auto& i : reverseEdges)
-	//{
-	//	cout << i.u << " " << i.v << endl;
-	//}
+	// Печать обратных ребер
+	for (auto& i : point)
+	{
+		cout << i << endl;
+	}
 }
 
  void PrintGraph(vector<vector<int>> graph, int size)
@@ -119,7 +172,6 @@ int main(int argc, char* argv[])
          cout << endl;
      }
  }
-
  void PrintStack(stack<int> s)
  {
 	 if (s.empty())
