@@ -23,12 +23,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="graph.txt" />
+    <Text Include="graph1.txt" />
     <Text Include="graph2.txt" />
     <Text Include="graph3.txt" />
     <Text Include="graph4.txt" />
-    <Text Include="graph5.txt" />
-    <Text Include="graph6.txt" />
     <Text Include="graph7.txt" />
     <Text Include="graph8.txt" />
   </ItemGroup>

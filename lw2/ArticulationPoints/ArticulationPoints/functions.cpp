@@ -116,27 +116,36 @@ std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std:
 
 	for (int i = 1; i < graphSize; ++i)
 	{
-		bool isCutVertice = true;
-		bool hasChild = false;
-		int countChild = 0;
+		int countBranch = 0;
+		int countEdges = 0;
 		int parentOfHangingVertice;
+
 		for (int j = 1; j < graphSize; ++j)
 		{
-			if (graph[i][j] == 1)
+			if (tin[i] < tin[j] && tout[i] > tout[j] && graph[i][j] == 1)
 			{
-				countChild = ++countChild;
-				parentOfHangingVertice = j;
-			}
-			if (tin[i] < tin[j] && tout[i] > tout[j])
-			{
-				hasChild = true;
-				for (auto x : reverseEdges)
+				++countBranch;
+				bool isReverseEdge = false;
+				for (int test = 1; test < graphSize; ++test)
 				{
-					if (x.max == j)
+					if (tin[j] <= tin[test] && tout[j] >= tout[test])
 					{
-						if (x.min < i) isCutVertice = false;
+						for (auto x : reverseEdges)
+						{
+							if (x.max == test)
+							{
+								if (x.min < j) isReverseEdge = true;
+							}
+						}
 					}
 				}
+				if (isReverseEdge) --countBranch;
+			}
+
+			if (graph[i][j] == 1)
+			{
+				countEdges = ++countEdges;
+				parentOfHangingVertice = j;
 			}
 		}
 
@@ -158,9 +167,23 @@ std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std:
 			continue;
 		}
 
-		if (countChild == 1) cutVertices.insert(parentOfHangingVertice);
-		if (!hasChild) continue;
-		if (isCutVertice) cutVertices.insert(i);
+		if (countEdges == 1) cutVertices.insert(parentOfHangingVertice);
+		if (countBranch != 0) cutVertices.insert(i);
 	}
 	return cutVertices;
+}
+
+bool isEdgeInReverse(int first, int second, std::vector<Edge> reverseEdges)
+{
+	int min = first < second ? first : second;
+	int max = first > second ? first : second;
+
+	for (auto x : reverseEdges)
+	{
+		if (x.max == max && x.min == min)
+		{
+			return true;
+		}
+		return false;
+	}
 }
