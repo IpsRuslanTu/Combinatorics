@@ -24,4 +24,4 @@ void DFS(const std::vector<std::vector<int>> graph, int root, std::vector<int>& 
 std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std::vector<int> tin,
 	std::vector<int> tout, std::vector<Edge> reverseEdges);
 
-bool isEdgeInReverse(int first, int second, std::vector<Edge> reverseEdges);
+bool isEdgeInReverse(int first, int second, std::vector<Edge>& reverseEdges);

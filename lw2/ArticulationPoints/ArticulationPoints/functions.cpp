@@ -122,19 +122,20 @@ std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std:
 
 		for (int j = 1; j < graphSize; ++j)
 		{
-			if (tin[i] < tin[j] && tout[i] > tout[j] && graph[i][j] == 1)
+			if (tin[i] < tin[j] && tout[i] > tout[j] && graph[i][j] == 1 
+				&& !isEdgeInReverse(i, j, reverseEdges))
 			{
 				++countBranch;
 				bool isReverseEdge = false;
-				for (int test = 1; test < graphSize; ++test)
+				for (int descendant = 1; descendant < graphSize; ++descendant)
 				{
-					if (tin[j] <= tin[test] && tout[j] >= tout[test])
+					if (tin[j] <= tin[descendant] && tout[j] >= tout[descendant])
 					{
 						for (auto x : reverseEdges)
 						{
-							if (x.max == test)
+							if (x.max == descendant)
 							{
-								if (x.min < j) isReverseEdge = true;
+								if (x.min < i) isReverseEdge = true;
 							}
 						}
 					}
@@ -173,17 +174,19 @@ std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std:
 	return cutVertices;
 }
 
-bool isEdgeInReverse(int first, int second, std::vector<Edge> reverseEdges)
+bool isEdgeInReverse(int first, int second, std::vector<Edge>& reverseEdges)
 {
 	int min = first < second ? first : second;
 	int max = first > second ? first : second;
+
+	bool has = false;
 
 	for (auto x : reverseEdges)
 	{
 		if (x.max == max && x.min == min)
 		{
-			return true;
+			has = true;
 		}
-		return false;
 	}
+	return has;
 }
