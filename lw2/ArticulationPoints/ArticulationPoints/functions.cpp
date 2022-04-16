@@ -114,62 +114,57 @@ std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std:
 	int graphSize = graph.size();
 	std::set<int> cutVertices;
 
-	for (int i = 1; i < graphSize; ++i)
+	for (int vertex = 1; vertex < graphSize; ++vertex)
 	{
-		int countBranch = 0;
-		int countEdges = 0;
-		int parentOfHangingVertice;
-
-		for (int j = 1; j < graphSize; ++j)
-		{
-			if (tin[i] < tin[j] && tout[i] > tout[j] && graph[i][j] == 1 
-				&& !isEdgeInReverse(i, j, reverseEdges))
-			{
-				++countBranch;
-				bool isReverseEdge = false;
-				for (int descendant = 1; descendant < graphSize; ++descendant)
-				{
-					if (tin[j] <= tin[descendant] && tout[j] >= tout[descendant])
-					{
-						for (auto x : reverseEdges)
-						{
-							if (x.max == descendant)
-							{
-								if (x.min < i) isReverseEdge = true;
-							}
-						}
-					}
-				}
-				if (isReverseEdge) --countBranch;
-			}
-
-			if (graph[i][j] == 1)
-			{
-				countEdges = ++countEdges;
-				parentOfHangingVertice = j;
-			}
-		}
-
-		if (i == root)
+		if (vertex == root)
 		{
 			bool isRootCutVertice = false;
 			for (int k = 1; k < graphSize; ++k)
 			{
-				if (graph[i][k] == 1)
+				if (graph[vertex][k] == 1 && tin[k] - 1 == tin[vertex] && tout[k] + 1 == tout[vertex])
 				{
-					if (tin[k] - 1 == tin[i] && tout[k] + 1 == tout[i])
-					{
-						isRootCutVertice = true;
-					}
+					isRootCutVertice = true;
 				}
 			}
-			if (!isRootCutVertice) cutVertices.insert(i);
+			if (!isRootCutVertice) cutVertices.insert(vertex);
 
 			continue;
 		}
 
+		int countBranch = 0;
+		int countEdges = 0;
+		int parentOfHangingVertice;
+
+		for (int child = 1; child < graphSize; ++child)
+		{
+			if (graph[vertex][child] == 1)
+			{
+				countEdges = ++countEdges;
+				parentOfHangingVertice = child;
+
+				if (tin[vertex] < tin[child] && tout[vertex] > tout[child]
+					&& !isEdgeInReverse(vertex, child, reverseEdges))
+				{
+					++countBranch;
+					bool isReverseEdge = false;
+					for (int descendant = 1; descendant < graphSize; ++descendant)
+					{
+						if (tin[child] <= tin[descendant] && tout[child] >= tout[descendant])
+						{
+							for (auto& edge : reverseEdges)
+							{
+								if (edge.max == descendant && tin[edge.min] < tin[vertex]) 
+									isReverseEdge = true;
+							}
+						}
+					}
+					if (isReverseEdge) --countBranch;
+				}
+			}
+		}
+
 		if (countEdges == 1) cutVertices.insert(parentOfHangingVertice);
-		if (countBranch != 0) cutVertices.insert(i);
+		if (countBranch != 0) cutVertices.insert(vertex);
 	}
 	return cutVertices;
 }
