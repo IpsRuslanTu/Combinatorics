@@ -92,8 +92,8 @@ void DFS(const std::vector<std::vector<int>> graph, int root, std::vector<int>& 
 				}
 				if (visited[i] && tin[vertex] - tin[i] > 1 && !tout[parent] && i != parent)
 				{
-					edge.min = (i < vertex) ? i : vertex;
-					edge.max = (i > vertex) ? i : vertex;
+					edge.start = (i < vertex) ? i : vertex;
+					edge.end = (i > vertex) ? i : vertex;
 					reverseEdges.push_back(edge);
 				}
 			}
@@ -111,8 +111,10 @@ void DFS(const std::vector<std::vector<int>> graph, int root, std::vector<int>& 
 std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std::vector<int> tin,
 	std::vector<int> tout, std::vector<Edge> reverseEdges)
 {
-	int graphSize = graph.size();
 	std::set<int> cutVertices;
+	int graphSize = graph.size();
+
+	if (graphSize <= 3) return cutVertices;
 
 	for (int vertex = 1; vertex < graphSize; ++vertex)
 	{
@@ -143,7 +145,7 @@ std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std:
 				parentOfHangingVertice = child;
 
 				if (tin[vertex] < tin[child] && tout[vertex] > tout[child]
-					&& !isEdgeInReverse(vertex, child, reverseEdges))
+					&& !isEdgeInReverse(vertex, child, reverseEdges, tin))
 				{
 					++countBranch;
 					bool isReverseEdge = false;
@@ -153,7 +155,7 @@ std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std:
 						{
 							for (auto& edge : reverseEdges)
 							{
-								if (edge.max == descendant && tin[edge.min] < tin[vertex]) 
+								if (edge.end == descendant && tin[edge.start] < tin[vertex]) 
 									isReverseEdge = true;
 							}
 						}
@@ -169,19 +171,16 @@ std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std:
 	return cutVertices;
 }
 
-bool isEdgeInReverse(int first, int second, std::vector<Edge>& reverseEdges)
+bool isEdgeInReverse(int first, int second, std::vector<Edge>& reverseEdges, std::vector<int> tin)
 {
-	int min = first < second ? first : second;
-	int max = first > second ? first : second;
+	int start = tin[first] < tin[second] ? first : second;
+	int end = tin[first] > tin[second] ? first : second;
 
-	bool has = false;
+	bool edgeInReverse = false;
 
 	for (auto x : reverseEdges)
 	{
-		if (x.max == max && x.min == min)
-		{
-			has = true;
-		}
+		if (x.end == end && x.start == start) edgeInReverse = true;
 	}
-	return has;
+	return edgeInReverse;
 }
