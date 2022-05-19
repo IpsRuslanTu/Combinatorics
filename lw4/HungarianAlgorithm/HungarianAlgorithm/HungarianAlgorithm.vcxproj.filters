@@ -15,22 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="HungarianAlgorithm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="functions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="graph1.txt" />
-    <Text Include="graph2.txt" />
-    <Text Include="graph3.txt" />
-    <Text Include="graph4.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="functions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
