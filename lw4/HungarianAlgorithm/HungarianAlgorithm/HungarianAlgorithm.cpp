@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <iterator>
 
 using namespace std;
 
@@ -10,7 +11,10 @@ optional<string> ParseArgs(int argc, char* argv[]);
 optional<ifstream> OpenFile(string fileIn);
 vector<vector<int>> ReadMatrixFromStream(ifstream& input, const int size);
 void PrintMatrix(const vector<vector<int>>& arr, int size);
-bool HungarianAlgorithm(const vector<vector<int>>& arr, int size);
+void HungarianAlgorithm(const vector<vector<int>>& arr, int size);
+bool IsValueInVector(vector<int>& arr, int value);
+int GetIndexOfValueInVector(vector<int>& arr, int value);
+int GetMinWithoutZeroInVector(vector<int>& arr);
 
 int main(int argc, char* argv[])
 {
@@ -31,7 +35,7 @@ int main(int argc, char* argv[])
 
 	vector<vector<int>> matrix = ReadMatrixFromStream(*input, size);
 
-	cout << HungarianAlgorithm(matrix, size) << endl;
+	HungarianAlgorithm(matrix, size);
 }
 
 optional<string> ParseArgs(int argc, char* argv[])
@@ -85,11 +89,11 @@ void PrintMatrix(const vector<vector<int>>& arr, int size)
 	}
 }
 
-bool HungarianAlgorithm(const vector<vector<int>>& arr, int size)
+void HungarianAlgorithm(const vector<vector<int>>& arr, int size)
 {
 	vector<vector<int>> tempArr(arr);
 
-	// Преборазую хотя бы одно ребро в каждой строке и столбце к 0.
+	// Преобразую хотя бы одно ребро в каждой строке к 0.
 	for (int i = 0; i < size; ++i)
 	{
 		// Использую i как строку
@@ -98,46 +102,99 @@ bool HungarianAlgorithm(const vector<vector<int>>& arr, int size)
 
 		for_each(tempArr[i].begin(), tempArr[i].end(), 
 			[minInLine](int& d) { d == INT_MAX ? d : d -= minInLine; });
+	}
 
-		// Использую i как столбец
-
+	// Преобразую хотя бы одно ребро в каждом столбце к 0.
+	for (int j = 0; j < size; ++j)
+	{
 		int minINColumn = INT_MAX;
 
-		for (int j = 0; j < size; ++j)
+		for (int i = 0; i < size; ++i)
 		{
-			minINColumn = tempArr[j][i] < minINColumn ? tempArr[j][i] : minINColumn;
+			minINColumn = tempArr[i][j] < minINColumn ? tempArr[i][j] : minINColumn;
 		}
 
 		if (minINColumn != 0)
 		{
 			for (int k = 0; k < size; ++k)
 			{
-				tempArr[k][i] = tempArr[k][i] == INT_MAX 
-					? tempArr[k][i] 
-					: tempArr[k][i] - minINColumn;
+				tempArr[k][j] = tempArr[k][j] == INT_MAX
+					? tempArr[k][j]
+					: tempArr[k][j] - minINColumn;
 			}
 		}
-
 	}
-
-	// -----------------------------------------------------------------
+	
 	vector<int> pare(size, -1);
 
 	for (int i = 0; i < size; ++i)
 	{
 		for (int j = 0; j < size; ++j)
 		{
-			if (tempArr[i][j] == 0 
-				&& find(pare.begin(), pare.end(), j) == pare.end())
+			if (tempArr[i][j] != 0) continue;
+				
+			if (!IsValueInVector(pare, j))
 			{
 				pare[i] = j;
 			}
-		}
+			else
+			{
+				int line1 = i;
+				int line2 = GetIndexOfValueInVector(pare, j);
+				int column = j;
 
-		if (count(pare.begin(), pare.end(), -1) == 0) return true;
+				int min1 = GetMinWithoutZeroInVector(tempArr[line1]);
+				int min2 = GetMinWithoutZeroInVector(tempArr[line2]);
+
+				int min = min1 < min2 ? min1 : min2;
+
+				for_each(tempArr[line1].begin(), tempArr[line1].end(),
+					[min](int& d) { (d == INT_MAX || d == 0) ? d : d -= min; });
+
+				for_each(tempArr[line2].begin(), tempArr[line2].end(),
+					[min](int& d) {  (d == INT_MAX || d == 0) ? d : d -= min; });
+			}
+		}
+	}
+}
+
+bool IsValueInVector(vector<int>& arr, int value)
+{
+	bool IsValue = false;
+
+	if (find(arr.begin(), arr.end(), value) != arr.end()) IsValue = true;
+
+	return IsValue;
+}
+
+int GetIndexOfValueInVector(vector<int>& arr, int value)
+{
+	int index = -1;
+
+	for (int i = 0; i < arr.size(); ++i)
+	{
+		if (arr[i] == value)
+		{
+			index = i;
+		}
 	}
 
-	copy(pare.begin(), pare.end(), ostream_iterator<int>(cout, " "));
-
-	return false;
+	return index;
 }
+
+int GetMinWithoutZeroInVector(vector<int>& arr)
+{
+	int min = INT_MAX;
+
+	for (int i = 0; i < arr.size(); ++i)
+	{
+		if (arr[i] != 0)
+		{
+			min = arr[i] < min ? arr[i] : min;
+		}
+	}
+
+	return min;
+}
+
+//copy(arr.begin(), arr.end(), ostream_iterator<int>(cout, " "));
