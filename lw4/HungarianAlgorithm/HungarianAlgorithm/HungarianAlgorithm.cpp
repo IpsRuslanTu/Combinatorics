@@ -11,10 +11,11 @@ optional<string> ParseArgs(int argc, char* argv[]);
 optional<ifstream> OpenFile(string fileIn);
 vector<vector<int>> ReadMatrixFromStream(ifstream& input, const int size);
 void PrintMatrix(const vector<vector<int>>& arr, int size);
-void HungarianAlgorithm(const vector<vector<int>>& arr, int size);
+bool HungarianAlgorithm(const vector<vector<int>>& arr, int size);
 bool IsValueInVector(vector<int>& arr, int value);
 int GetIndexOfValueInVector(vector<int>& arr, int value);
 int GetMinWithoutZeroInVector(vector<int>& arr);
+bool Try_kuhn(int v, vector<bool>& used, vector<int>& mt, vector<vector<int>>& BZero);
 
 int main(int argc, char* argv[])
 {
@@ -89,7 +90,7 @@ void PrintMatrix(const vector<vector<int>>& arr, int size)
 	}
 }
 
-void HungarianAlgorithm(const vector<vector<int>>& arr, int size)
+bool HungarianAlgorithm(const vector<vector<int>>& arr, int size)
 {
 	vector<vector<int>> tempArr(arr);
 
@@ -125,36 +126,53 @@ void HungarianAlgorithm(const vector<vector<int>>& arr, int size)
 		}
 	}
 	
-	vector<int> pare(size, -1);
-
+	vector<vector<int>> BZero(size);
 	for (int i = 0; i < size; ++i)
 	{
 		for (int j = 0; j < size; ++j)
 		{
-			if (tempArr[i][j] != 0) continue;
-				
-			if (!IsValueInVector(pare, j))
+			if (tempArr[i][j] == 0)
 			{
-				pare[i] = j;
-			}
-			else
-			{
-				int line1 = i;
-				int line2 = GetIndexOfValueInVector(pare, j);
-				int column = j;
-
-				int min1 = GetMinWithoutZeroInVector(tempArr[line1]);
-				int min2 = GetMinWithoutZeroInVector(tempArr[line2]);
-
-				int min = min1 < min2 ? min1 : min2;
-
-				for_each(tempArr[line1].begin(), tempArr[line1].end(),
-					[min](int& d) { (d == INT_MAX || d == 0) ? d : d -= min; });
-
-				for_each(tempArr[line2].begin(), tempArr[line2].end(),
-					[min](int& d) {  (d == INT_MAX || d == 0) ? d : d -= min; });
+				BZero[i].push_back(j);
 			}
 		}
+	}
+
+	vector<int> mt(size, -1);
+	vector<bool> used;
+
+	for (int v = 0; v < size; ++v) {
+		used.assign(size, false);
+		Try_kuhn(v, used, mt, BZero);
+	}
+
+	for (int i = 0; i < size; ++i)
+	{
+		cout << mt[i] << ", " << i << endl;
+	}
+
+	for (int i = 0; i < size; ++i)
+	{
+		cout << used[i] << ", " << i << endl;
+	}
+	
+	if (std::find(mt.begin(), mt.end(), -1) != mt.end())
+	{
+		int index = GetIndexOfValueInVector(mt, -1);
+
+		for (int j = 0; j < size; ++j)
+		{
+			int column;
+			if (tempArr[index][j] == 0)
+			{
+				column = j;
+			}
+		}
+	}
+	else
+	{
+		cout << "Task completed" << endl;
+		return true;
 	}
 }
 
@@ -197,4 +215,20 @@ int GetMinWithoutZeroInVector(vector<int>& arr)
 	return min;
 }
 
-//copy(arr.begin(), arr.end(), ostream_iterator<int>(cout, " "));
+bool Try_kuhn(int v, vector<bool>& used, vector<int>& mt, vector<vector<int>>& BZero) {
+	if (used[v])  return false;
+	used[v] = true;
+	for (size_t i = 0; i < BZero[v].size(); ++i) {
+		int to = BZero[v][i];
+		if (mt[to] == -1 || Try_kuhn(mt[to], used, mt, BZero)) {
+			mt[to] = v;
+			return true;
+		}
+	}
+	return false;
+}
+
+//void NewTransformation(vector<vector<int>>)
+//{
+//
+//}
