@@ -171,7 +171,8 @@ std::set<int> GetCutVertices(std::vector<std::vector<int>> graph, int root, std:
 	return cutVertices;
 }
 
-bool isEdgeInReverse(int first, int second, std::vector<Edge>& reverseEdges, std::vector<int> tin)
+bool isEdgeInReverse(int first, int second, std::vector<Edge>& reverseEdges, 
+	std::vector<int> tin)
 {
 	int start = tin[first] < tin[second] ? first : second;
 	int end = tin[first] > tin[second] ? first : second;
