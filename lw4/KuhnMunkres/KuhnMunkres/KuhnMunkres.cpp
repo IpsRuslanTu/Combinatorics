@@ -42,11 +42,10 @@ int main(int argc, char* argv[])
 	}
 	else {
 		cout << "Yes\n";
-	}
-
-	for (int i = 0; i < size; ++i)
-	{
-		cout << result[i] << " , " << i << endl;
+		for (int i = 0; i < size; ++i)
+		{
+			cout << result[i] << " , " << i << endl;
+		}
 	}
 }
 
